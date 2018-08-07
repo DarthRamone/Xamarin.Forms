@@ -27,19 +27,27 @@ namespace PreviewerWPF
 		Rectangle rect;
 		protected override void OnPaintSurface(SKPaintSurfaceEventArgs e)
 		{
-			if (currentElement == null)
-				return;
-			//TODO: Draw this puppy
-			var canvas = e.Surface.Canvas;
+			try
+			{
+				if (currentElement == null)
+					return;
+				//TODO: Draw this puppy
+				var canvas = e.Surface.Canvas;
 
-			// get the screen density for scaling
-			var scale = (float)PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice.M11;
-			var scaledSize = new SKSize(e.Info.Width / scale, e.Info.Height / scale);
+				// get the screen density for scaling
+				var scale = (float)PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice.M11;
+				var scaledSize = new SKSize(e.Info.Width / scale, e.Info.Height / scale);
 
-			// handle the device screen density
-			canvas.Scale(scale);
+				// handle the device screen density
+				canvas.Scale(scale);
 
-			Forms.Draw(currentElement, rect, e.Surface);
+				Forms.Draw(currentElement, rect, e.Surface);
+			}
+			catch(Exception ex)
+			{
+				Console.WriteLine(ex);
+				//Report exception
+			}
 		}
 	}
 }

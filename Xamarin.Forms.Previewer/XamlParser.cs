@@ -77,8 +77,17 @@ namespace  Xamarin.Forms.Previewer
 </ContentPage>";
 		public static Element ParseXaml(string xaml)
 		{
-			//TODO: Determine what type it is.
-			return new ContentPage().LoadFromXaml(xaml);
+			try
+			{
+				//TODO: Determine what type it is.
+				return new ContentPage().LoadFromXaml(xaml);
+			}
+			catch(Exception e)
+			{
+				Console.WriteLine(e);
+				//Report back xaml errors
+				return null;
+			}
 		}
 	}
 }
