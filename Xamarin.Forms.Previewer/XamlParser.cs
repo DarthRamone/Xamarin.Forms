@@ -76,18 +76,18 @@ namespace  Xamarin.Forms.Previewer
 
     </Grid>
 </ContentPage>";
-		public static Element ParseXaml(string xaml)
+		public static (Element element, Exception error) ParseXaml(string xaml)
 		{
 			try
 			{
 				//TODO: Determine what type it is.
-				return new ContentPage().LoadFromXaml(xaml);
+				return (new ContentPage().LoadFromXaml(xaml),null);
 			}
 			catch(Exception e)
 			{
 				Console.WriteLine(e);
 				//Report back xaml errors
-				return null;
+				return (null, e);
 			}
 		}
 	}

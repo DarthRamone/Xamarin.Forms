@@ -49,9 +49,11 @@ namespace PreviewerWPF
 		async Task Render()
 		{
 
-			var element = XamlParser.ParseXaml(XamlEntry.Text);
+			var result = XamlParser.ParseXaml(XamlEntry.Text);
+			xamlError.Text = result.error?.ToString();
 			//TODO: get sizes
-			await Previewer.Draw(element, 480, 600);
+			if(result.element != null)
+				await Previewer.Draw(result.element, 480, 600);
 		}
 	}
 }

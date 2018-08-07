@@ -12,11 +12,16 @@
 			<ColumnDefinition Width="*" />
 			<ColumnDefinition Width="*" />
 		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto"/>
+		</Grid.RowDefinitions>
 		<TextBox x:Name="XamlEntry" TextChanged="XamlEntry_TextChanged" AcceptsReturn="True" AcceptsTab="True" TextWrapping="Wrap" Background="White" />
 		<Grid Grid.Column="1">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="*" />
@@ -26,5 +31,12 @@
 			<ComboBox Grid.Column="1" Margin="10" />
 			<local:SkiaPreviewer x:Name="Previewer" Grid.Row="1" Grid.ColumnSpan="2" />
 		</Grid>
+		<ScrollViewer HorizontalScrollBarVisibility="Auto" CanContentScroll="True" Grid.Row="1" >
+			<TextBlock x:Name="xamlError" />
+		</ScrollViewer>
+
+		<ScrollViewer Grid.Row="1"  Grid.Column="1">
+			<Label x:Name="renderError"/>
+		</ScrollViewer>
 	</Grid>
 </Window>
