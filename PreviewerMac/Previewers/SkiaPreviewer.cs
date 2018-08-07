@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using SkiaSharp.Views.Mac;
 using Xamarin.Forms;
+using Xamarin.Forms.Previewer;
 
 namespace PreviewerMac.Previewers
 {

@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
-namespace PreviewerMac.Previewers
+namespace Xamarin.Forms.Previewer
 {
 	public interface IPreviewer
 	{

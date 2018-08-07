@@ -4,6 +4,7 @@ using AppKit;
 using Foundation;
 using PreviewerMac.Previewers;
 using Xamarin.Forms.Platform.Skia;
+using Xamarin.Forms.Previewer;
 namespace PreviewerMac
 {
 
