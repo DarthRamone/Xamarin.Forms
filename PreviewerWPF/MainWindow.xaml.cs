@@ -30,10 +30,22 @@ namespace PreviewerWPF
 
 			InitializeComponent();
 			XamlEntry.Text = XamlParser.XamlSimpleString;
+			Previewer.Redraw += Previewer_Redraw;
+		}
+
+		private async void Previewer_Redraw(object sender, EventArgs e)
+		{
+			await Render();
 		}
 
 		private async void XamlEntry_TextChanged(object sender, TextChangedEventArgs e)
 		{
+			await Render();
+		}
+
+		async Task Render()
+		{
+
 			var element = XamlParser.ParseXaml(XamlEntry.Text);
 			//TODO: get sizes
 			await Previewer.Draw(element, 480, 600);
