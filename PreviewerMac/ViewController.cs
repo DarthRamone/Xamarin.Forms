@@ -1,6 +1,7 @@
 ﻿using System;
 
 using AppKit;
+using CoreGraphics;
 using Foundation;
 
 namespace PreviewerMac
@@ -13,9 +14,12 @@ namespace PreviewerMac
 
 		public override void ViewDidLoad()
 		{
-			base.ViewDidLoad();
-
-			// Do any additional setup after loading the view.
+			View = new PreviewerView();
+		}
+		public override void ViewWillTransition(CGSize newSize)
+		{
+			base.ViewWillTransition(newSize);
+			View.Frame = new CGRect(new CGPoint(0, 0), newSize);
 		}
 
 		public override NSObject RepresentedObject
