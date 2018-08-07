@@ -14,7 +14,7 @@ namespace PreviewerMac
 	{
 		NSComboBox rendererPicker;
 		NSComboBox sizePicker;
-		NSTextView xamlEntry;
+		NSTextField xamlEntry;
 		IPreviewer previewer;
 		NSView nativePreviewView;
 
@@ -40,16 +40,17 @@ namespace PreviewerMac
 
 			rendererPicker = new NSComboBox();
 			sizePicker = new NSComboBox();
-			xamlEntry = new NSTextView();
-			xamlEntry.TextDidChange += XamlEntry_TextDidChange;
+			xamlEntry = new NSTextField();
+			xamlEntry.Changed += XamlEntry_Changed;
 			previewer = new SkiaPreviewer();
+			xamlEntry.StringValue = XamlParser.XamlSimpleString;
 			nativePreviewView = previewer as NSView;
 
 		}
 
-		void XamlEntry_TextDidChange(object sender, EventArgs e)
+		void XamlEntry_Changed(object sender, EventArgs e)
 		{
-			var element = XamlParser.ParseXaml(xamlEntry.TextStorage.Value);
+			var element = XamlParser.ParseXaml(xamlEntry.StringValue);
 			//TODO: Get current size
 			previewer.Draw(element, 480, 620);
 		}
