@@ -7,6 +7,7 @@ namespace  Xamarin.Forms.Previewer
 		public static string XamlSimpleString = @"<ContentPage xmlns=""http://xamarin.com/schemas/2014/forms""
              xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
              x:Class=""XamlSamples.GridDemoPage""
+             BackgroundColor=""Blue""
              Title=""Grid Demo Page"">
 	<Label Text=""Hello, XAML!""
        VerticalOptions=""Center""

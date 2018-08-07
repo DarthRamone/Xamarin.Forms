@@ -14,8 +14,11 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xamarin.Forms;
 using Xamarin.Forms.Platform.Skia;
 using Xamarin.Forms.Previewer;
+
+using Rectangle = Xamarin.Forms.Rectangle;
 
 namespace PreviewerWPF
 {
@@ -38,7 +41,7 @@ namespace PreviewerWPF
 			await Render();
 		}
 
-		private async void XamlEntry_TextChanged(object sender, TextChangedEventArgs e)
+		private async void XamlEntry_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
 			await Render();
 		}
