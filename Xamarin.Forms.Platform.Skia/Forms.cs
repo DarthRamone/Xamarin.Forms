@@ -1,4 +1,6 @@
-﻿namespace Xamarin.Forms.Platform.Skia
+﻿using SkiaSharp;
+
+namespace Xamarin.Forms.Platform.Skia
 {
 
 	public static class Forms
@@ -9,9 +11,11 @@
 			Device.Info = new SkiaDeviceInfo();
 		}
 
-		public static void Draw (Element element, Rectangle region, SkiaSharp.SKSurface surface)
+		public static void Draw (Element element, Rectangle region, SKSurface surface)
 		{
-			
+			var canvas = surface.Canvas;
+
+			canvas.Clear(SKColors.Purple);
 		}
 	}
 }
