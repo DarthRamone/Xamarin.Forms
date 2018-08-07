@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xamarin.Forms.Platform.Skia;
 
 namespace PreviewerWPF
 {
@@ -22,6 +23,8 @@ namespace PreviewerWPF
 	{
 		public MainWindow()
 		{
+			Forms.Init();
+
 			InitializeComponent();
 		}
 	}
