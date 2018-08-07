@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xamarin.Forms.Platform.Skia;
+using Xamarin.Forms.Previewer;
 
 namespace PreviewerWPF
 {
@@ -28,36 +29,14 @@ namespace PreviewerWPF
 			Forms.Init();
 
 			InitializeComponent();
+			XamlEntry.Text = XamlParser.XamlSimpleString;
 		}
 
-		private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+		private async void XamlEntry_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			// the the canvas and properties
-			var canvas = e.Surface.Canvas;
-
-			// get the screen density for scaling
-			var scale = (float)PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice.M11;
-			var scaledSize = new SKSize(e.Info.Width / scale, e.Info.Height / scale);
-
-			// handle the device screen density
-			canvas.Scale(scale);
-
-			//// make sure the canvas is blank
-			//canvas.Clear(SKColors.White);
-
-			//// draw some text
-			//var paint = new SKPaint
-			//{
-			//	Color = SKColors.Black,
-			//	IsAntialias = true,
-			//	Style = SKPaintStyle.Fill,
-			//	TextAlign = SKTextAlign.Center,
-			//	TextSize = 24
-			//};
-			//var coord = new SKPoint(scaledSize.Width / 2, (scaledSize.Height + paint.TextSize) / 2);
-			//canvas.DrawText("SkiaSharp", coord, paint);
-
-			Forms.Draw(null, Xamarin.Forms.Rectangle.Zero, e.Surface);
+			var element = XamlParser.ParseXaml(XamlEntry.Text);
+			//TODO: get sizes
+			await Previewer.Draw(element, 480, 600);
 		}
 	}
 }
