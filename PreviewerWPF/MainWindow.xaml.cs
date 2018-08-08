@@ -32,28 +32,34 @@ namespace PreviewerWPF
 			Forms.Init();
 
 			InitializeComponent();
+			sizeComboBox.SelectedIndex = 0;
 			XamlEntry.Text = XamlParser.XamlSimpleString;
 			Previewer.Redraw += Previewer_Redraw;
 		}
 
 		private async void Previewer_Redraw(object sender, EventArgs e)
 		{
-			await Render();
+			Render();
 		}
 
 		private async void XamlEntry_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
 		{
-			await Render();
+			Render();
 		}
 
-		async Task Render()
+		async void Render()
 		{
 
 			var result = XamlParser.ParseXaml(XamlEntry.Text);
 			xamlError.Text = result.error?.ToString();
-			//TODO: get sizes
+			var size = ScreenSize.Sizes[sizeComboBox.SelectedIndex];
 			if(result.element != null)
-				await Previewer.Draw(result.element, 480, 600);
+				await Previewer.Draw(result.element, size.Width, size.Height);
+		}
+
+		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			Render();
 		}
 	}
 }

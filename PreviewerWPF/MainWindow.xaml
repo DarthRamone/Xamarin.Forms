@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
         xmlns:local="clr-namespace:PreviewerWPF"
+		xmlns:prev="clr-namespace:Xamarin.Forms.Previewer;assembly=Xamarin.Forms.Previewer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -28,7 +29,7 @@
 				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 			<ComboBox Margin="10" />
-			<ComboBox Grid.Column="1" Margin="10" />
+			<ComboBox x:Name="sizeComboBox" Grid.Column="1" Margin="10" ItemsSource="{x:Static prev:ScreenSize.Sizes}" DisplayMemberPath="Description"  SelectionChanged="ComboBox_SelectionChanged"/>
 			<local:SkiaPreviewer x:Name="Previewer" Grid.Row="1" Grid.ColumnSpan="2" />
 		</Grid>
 		<ScrollViewer HorizontalScrollBarVisibility="Auto" CanContentScroll="True" Grid.Row="1" >

@@ -80,6 +80,8 @@ namespace  Xamarin.Forms.Previewer
 		{
 			try
 			{
+				if (string.IsNullOrWhiteSpace(xaml))
+					return (null, null);
 				//TODO: Determine what type it is.
 				return (new ContentPage().LoadFromXaml(xaml),null);
 			}
