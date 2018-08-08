@@ -11,15 +11,6 @@ namespace PreviewerMac
 		public ViewController(IntPtr handle) : base(handle)
 		{
 		}
-		public override void LoadView()
-		{
-			View = new PreviewerView();
-		}
-		public override void ViewWillTransition(CGSize newSize)
-		{
-			base.ViewWillTransition(newSize);
-			// View.Frame = new CGRect(new CGPoint(0, 0), newSize);
-		}
 
 		public override NSObject RepresentedObject
 		{

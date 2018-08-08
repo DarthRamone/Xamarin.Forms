@@ -1,10 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using AppKit;
+using CoreGraphics;
 using Foundation;
 using PreviewerMac.Previewers;
 using Xamarin.Forms.Platform.Skia;
 using Xamarin.Forms.Previewer;
+using System.Threading.Tasks;
 namespace PreviewerMac
 {
 
@@ -37,20 +39,30 @@ namespace PreviewerMac
 
 		void Initialize()
 		{
+			//Layer.BackgroundColor = NSColor.Blue.CGColor;
+			AddSubview(rendererPicker = new NSComboBox());
+			AddSubview(sizePicker = new NSComboBox());
+			AddSubview(xamlEntry = new NSTextField
+			{
+				BackgroundColor = NSColor.White,
+				TextColor = NSColor.Black,
+			});
 
-			rendererPicker = new NSComboBox();
-			sizePicker = new NSComboBox();
-			xamlEntry = new NSTextField();
 			xamlEntry.Changed += XamlEntry_Changed;
 			previewer = new SkiaPreviewer();
 			xamlEntry.StringValue = XamlParser.XamlSimpleString;
-			nativePreviewView = previewer as NSView;
+			AddSubview(nativePreviewView = previewer as NSView);
+			Refresh();
 
 		}
 
 		void XamlEntry_Changed(object sender, EventArgs e)
 		{
-			var element = XamlParser.ParseXaml(xamlEntry.StringValue);
+			Refresh();
+		}
+		void Refresh()
+		{
+			var (element, error) = XamlParser.ParseXaml(xamlEntry.StringValue);
 			//TODO: Get current size
 			previewer.Draw(element, 480, 620);
 		}
@@ -78,7 +90,7 @@ namespace PreviewerMac
 
 			var top = topHeight;
 			var sideHeight = this.Bounds.Height - top;
-			frame = new CoreGraphics.CGRect(padding, top, half - doublePadding, sideHeight);
+			frame = new CGRect(padding, top, half - doublePadding, sideHeight);
 			xamlEntry.Frame = frame;
 
 			frame.X = half + padding;

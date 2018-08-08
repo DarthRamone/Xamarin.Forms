@@ -1,5 +1,6 @@
 ﻿using AppKit;
 using Foundation;
+using Xamarin.Forms.Platform.Skia;
 
 namespace PreviewerMac
 {
@@ -8,6 +9,7 @@ namespace PreviewerMac
 	{
 		public AppDelegate()
 		{
+			Forms.Init();
 		}
 
 		public override void DidFinishLaunching(NSNotification notification)
