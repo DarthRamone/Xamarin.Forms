@@ -44,7 +44,7 @@ namespace PreviewerMac.Previewers
 				// handle the device screen density
 				canvas.Scale(scale);
 
-				Xamarin.Forms.Platform.Skia.Forms.Draw(currentElement, rect, surface);
+				Xamarin.Forms.Platform.Skia.Forms.Draw(currentElement, rect, surface, () => this.SetNeedsDisplayInRect(Bounds));
 			}
 			catch (Exception ex)
 			{

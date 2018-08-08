@@ -16,7 +16,7 @@ namespace Xamarin.Forms.Platform.Skia
 			Device.Info = new SkiaDeviceInfo();
 		}
 
-		public static void Draw (Element element, Rectangle region, SKSurface surface)
+		public static void Draw (Element element, Rectangle region, SKSurface surface, Action redraw )
 		{
 			var canvas = surface.Canvas;
 

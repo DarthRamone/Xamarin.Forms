@@ -41,7 +41,7 @@ namespace PreviewerWPF
 				// handle the device screen density
 				canvas.Scale(scale);
 
-				Forms.Draw(currentElement, rect, e.Surface);
+				Forms.Draw(currentElement, rect, e.Surface, ()=> InvalidateVisual());
 			}
 			catch(Exception ex)
 			{
