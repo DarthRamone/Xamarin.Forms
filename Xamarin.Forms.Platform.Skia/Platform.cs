@@ -31,11 +31,19 @@ namespace Xamarin.Forms.Platform.Skia
 					IsAntialias = true
 				};
 
-				var bounds = new SKRect();
-				if(!string.IsNullOrWhiteSpace(text))
-					paint.MeasureText(text, ref bounds);
+				float lineHeight = paint.TextSize * 1.25f;
+				float measuredWidth = 0;
+				float measuredHeight = 0;
+				while (!string.IsNullOrWhiteSpace(text))
+				{
+					paint.BreakText(text, (float)widthConstraint, out var mWidth, out var mText);
 
-				var size = new Size(bounds.Width, paint.TextSize * 1.25);
+					measuredHeight += lineHeight;
+					text = text.Substring(mText.Length);
+					measuredWidth = Math.Max(mWidth, measuredWidth);
+				}
+
+				var size = new Size(measuredWidth, measuredHeight);
 
 				if (view is Button)
 					size += new Size(10, 10);

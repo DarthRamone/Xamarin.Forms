@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using Xamarin.Forms.Internals;
 
@@ -86,7 +87,7 @@ namespace Xamarin.Forms.Platform.Skia
 			var RoundRectangleStyleFillShadow = SKImageFilter.CreateDropShadow(0, 0, 4, 4, RoundRectangleStyleFillShadowColor, SKDropShadowImageFilterShadowMode.DrawShadowAndForeground, null, null);
 
 			// Fill color for Round Rectangle Style
-			var RoundRectangleStyleFillColor = button.BackgroundColor.ToSKColor(new Color(0.7));
+			var RoundRectangleStyleFillColor = button.BackgroundColor.ToSKColor(Color.Transparent);
 
 			// New Round Rectangle Style fill paint
 			var RoundRectangleStyleFillPaint = new SKPaint()
@@ -132,6 +133,7 @@ namespace Xamarin.Forms.Platform.Skia
 				IsAntialias = true,
 				TextSize = (float)fontSize,
 			};
+
 			if(!string.IsNullOrWhiteSpace(text))
 				canvas.DrawText(text, (float)x, (float)y + paint.TextSize, paint);
 		}
@@ -140,7 +142,105 @@ namespace Xamarin.Forms.Platform.Skia
 		{
 			DrawVisualElement(label, canvas);
 
-			DrawText(label.Text, canvas, label.TextColor, label.FontSize, label.X, label.Y);
+			DrawText(label.Text, canvas, new TextDrawingData()
+			{
+				Color = label.TextColor,
+				Rect = label.Bounds,
+				FontSize = label.FontSize,
+				Wrapping = label.LineBreakMode,
+			});
 		}
+
+		private static void DrawText(string text, SKCanvas canvas, TextDrawingData data)
+		{
+			canvas.Save();
+
+			var maxWidth = data.Rect.Width;
+			var lineHeight = (float)data.FontSize * 1.25f;
+
+			var paint = new SKPaint
+			{
+				Color = data.Color.ToSKColor(Color.Black),
+				IsAntialias = true,
+				TextSize = (float)data.FontSize
+			};
+
+			List<string> lines = new List<string>();
+
+			var remaining = text;
+
+
+			canvas.ClipRect(data.Rect.ToSKRect());
+
+			while (!string.IsNullOrEmpty(remaining))
+			{
+				paint.BreakText(remaining, (float)maxWidth, out var measuredWidth, out var measuredText);
+
+				if (data.Wrapping == LineBreakMode.NoWrap)
+				{
+					lines.Add(measuredText);
+					break;
+				}
+				else if (data.Wrapping == LineBreakMode.WordWrap)
+				{
+					if (measuredText.Length != remaining.Length)
+					{
+						for (int i = measuredText.Length - 1; i >= 0; i--)
+						{
+							if (char.IsWhiteSpace(measuredText[i]))
+							{
+								measuredText = measuredText.Substring(0, i+1);
+								break;
+							}
+						}
+					}
+
+					lines.Add(measuredText);
+				}
+				else if (data.Wrapping == LineBreakMode.HeadTruncation)
+				{
+					throw new NotImplementedException();
+				}
+				else if (data.Wrapping == LineBreakMode.TailTruncation)
+				{
+					measuredText = measuredText.Substring(0, Math.Max(0, measuredText.Length - 2)) + "...";
+					lines.Add(measuredText);
+					break;
+				}
+				else if (data.Wrapping == LineBreakMode.MiddleTruncation)
+				{
+					throw new NotImplementedException();
+				}
+
+				remaining = remaining.Substring(measuredText.Length);
+			}
+
+			var y = (float)data.Rect.Top;
+			y += paint.TextSize;
+
+			foreach (var line in lines)
+			{
+				if (!string.IsNullOrWhiteSpace(line))
+				{
+					canvas.DrawText(line, (float)data.Rect.X, y, paint);
+				}
+
+				y += lineHeight;
+			}
+
+			canvas.Restore();
+		}
+	}
+
+	public class TextDrawingData
+	{
+		public Color Color { get; set; }
+		public TextAlignment HAlign { get; set; }
+		public TextAlignment VAlign { get; set; }
+		public double FontSize { get; set; }
+		public Rectangle Rect { get; set; }
+		public string FontFamily { get; set; }
+		public FontAttributes Attributes { get; set; }
+		public LineBreakMode Wrapping { get; set; }
 	}
 }
