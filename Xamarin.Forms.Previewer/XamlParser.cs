@@ -5,21 +5,19 @@ namespace  Xamarin.Forms.Previewer
 	public class XamlParser
 	{
 		public static string XamlPlaybackScreen = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-<controls:ModalPage Title=""AFSPELEN VAN AFSPEELLIJST"" Subtitle=""Kickass Tunes"" BackgroundColor=""#181818""
+<ContentPage Title=""AFSPELEN VAN AFSPEELLIJST"" BackgroundColor=""#181818""
     xmlns=""http://xamarin.com/schemas/2014/forms"" 
-    xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml"" 
-    xmlns:controls=""clr-namespace:KickassUI.Spotify.Controls;assembly=KickassUI.Spotify""
-    xmlns:effects=""clr-namespace:KickassUI.Spotify.Effects;assembly=KickassUI.Spotify""
+    xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
     x:Class=""KickassUI.Spotify.Pages.PlayerPage"">
     <ContentPage.ToolbarItems>
         <ToolbarItem Icon=""icon_chevron_down"" Command=""{Binding ClosePlayerCommand}"" />
         <ToolbarItem Icon=""icon_playlist"" />
     </ContentPage.ToolbarItems>
 	<ContentPage.Content>
-        <controls:PaddedScrollView Orientation=""Vertical"">
+        <ScrollView Orientation=""Vertical"">
             <Grid>
                 <AbsoluteLayout>
-                    <controls:BlurredImage AbsoluteLayout.LayoutBounds=""0,0,1,1"" AbsoluteLayout.LayoutFlags=""All"" InputTransparent=""false"" x:Name=""artwork"" 
+                    <Image AbsoluteLayout.LayoutBounds=""0,0,1,1"" AbsoluteLayout.LayoutFlags=""All"" InputTransparent=""false"" x:Name=""artwork"" 
                     HorizontalOptions=""FillAndExpand"" Aspect=""Fill"" VerticalOptions=""FillAndExpand"" Source=""{Binding Song.AlbumImageUrl}"" />
                 </AbsoluteLayout>
                 <StackLayout HorizontalOptions=""FillAndExpand""> 
@@ -36,7 +34,7 @@ namespace  Xamarin.Forms.Previewer
                                 <On Platform=""iOS"" Value=""false"" />
                             </OnPlatform>
                         </StackLayout.IsVisible>
-                        <Image Source=""icon_chevron_down"" VerticalOptions=""Center"" HorizontalOptions=""Start"">
+                        <Image Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/icon_chevron_down%402x.png"" VerticalOptions=""Center"" HorizontalOptions=""Start"">
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer Command=""{Binding ClosePlayerCommand}""/>
                             </Image.GestureRecognizers>
@@ -45,9 +43,9 @@ namespace  Xamarin.Forms.Previewer
                             <Label Text=""NOW PLAYING FROM PLAYLIST"" TextColor=""#FFF"" FontSize=""12"" HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
                             <Label Text=""Kickass Tunes"" Margin=""0,-5,0,0"" TextColor=""#FFF"" FontSize=""12"" HorizontalTextAlignment=""Center"" HorizontalOptions=""Fill"" />
                         </StackLayout>
-                        <Image Source=""icon_playlist"" VerticalOptions=""Center"" HorizontalOptions=""End"" />
+                        <Image Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/icon_playlist%402x.png"" VerticalOptions=""Center"" HorizontalOptions=""End"" />
                     </StackLayout>
-                    <Image Source=""{Binding Song.AlbumImageUrl}"" VerticalOptions=""Center"">
+                    <Image Source=""https://i.scdn.co/image/08d56eac0c7d48bb8bf7752b2202c3314db79394"" VerticalOptions=""Center"">
                         <Image.HeightRequest>
                             <OnPlatform x:TypeArguments=""x:Double"">
                                 <On Platform=""Android"" Value=""300"" />
@@ -61,12 +59,12 @@ namespace  Xamarin.Forms.Previewer
                             <ColumnDefinition Width=""*"" />
                             <ColumnDefinition Width=""Auto"" />
                         </Grid.ColumnDefinitions>
-                        <Image Source=""icon_plus"" Grid.Column=""0"" HorizontalOptions=""Center"" />
+                        <Image Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/icon_plus%402x.png"" Grid.Column=""0"" HorizontalOptions=""Center"" />
                         <StackLayout Grid.Column=""1"" HorizontalOptions=""Center"">
-                            <Label Text=""{Binding Song.Title}"" HorizontalOptions=""FillAndExpand"" HorizontalTextAlignment=""Center"" Style=""{StaticResource BoldLabel}"" FontSize=""18"" TextColor=""White"" />
+                            <Label Text=""{Binding Song.Title}"" HorizontalOptions=""FillAndExpand"" HorizontalTextAlignment=""Center"" FontSize=""18"" TextColor=""White"" />
                             <Label Margin=""0,-5,0,0"" Text=""{Binding Song.Artist}"" HorizontalOptions=""FillAndExpand"" HorizontalTextAlignment=""Center"" FontSize=""14"" TextColor=""#adaeb2"" />
                         </StackLayout>
-                        <Image Source=""icon_ellipsis"" Grid.Column=""2"" HorizontalOptions=""Center"" />
+                        <Image Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/icon_ellipsis%402x.png"" Grid.Column=""2"" HorizontalOptions=""Center"" />
                     </Grid>
                     <ContentView>
                         <ContentView.IsVisible>
@@ -76,17 +74,11 @@ namespace  Xamarin.Forms.Previewer
                             </OnPlatform>
                         </ContentView.IsVisible>
                         <StackLayout Margin=""0,0,0,0"" Orientation=""Horizontal"">
-                            <Label Text=""{Binding Ticks, Converter={StaticResource SecondsToTimeConverter}}"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""StartAndExpand"" />
-                            <Label Text=""{Binding TicksLeft, Converter={StaticResource SecondsToTimeConverter}}"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""End"" />
+                            <Label Text=""{Binding Ticks}"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""StartAndExpand"" />
+                            <Label Text=""{Binding TicksLeft}"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""End"" />
                         </StackLayout>
-                        <controls:AudioSlider HasThumb=""true"" HeightRequest=""4"" Minimum=""0"" Maximum=""{Binding Song.LengthInSeconds}"" Value=""{Binding Ticks, Mode=TwoWay}"">
-                            <controls:AudioSlider.Margin>
-                                <OnPlatform x:TypeArguments=""Thickness"">
-                                    <On Platform=""iOS"" Value=""-5,0,-5,0"" />
-                                    <On Platform=""Android"" Value=""-5,0,-5,0"" />
-                                </OnPlatform>
-                            </controls:AudioSlider.Margin>
-                        </controls:AudioSlider>
+                        <Slider HeightRequest=""4"" Minimum=""0"" Maximum=""{Binding Song.LengthInSeconds}"" Value=""{Binding Ticks, Mode=TwoWay}"">
+                        </Slider>
                     </ContentView>
                      <StackLayout Margin=""0,0,0,0"" Orientation=""Horizontal"">
                         <StackLayout.IsVisible>
@@ -95,35 +87,29 @@ namespace  Xamarin.Forms.Previewer
                                 <On Platform=""iOS"" Value=""false""/>
                             </OnPlatform>
                         </StackLayout.IsVisible>
-                        <Label Text=""{Binding Ticks, Converter={StaticResource SecondsToTimeConverter}}"" Margin=""0,0,5,0"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""Start"" />
-                        <controls:AudioSlider HasThumb=""true"" HorizontalOptions=""FillAndExpand"" VerticalOptions=""Center"" HeightRequest=""4"" Minimum=""0"" Maximum=""{Binding Song.LengthInSeconds}"" Value=""{Binding Ticks, Mode=TwoWay}"">
-                            <controls:AudioSlider.Margin>
-                                <OnPlatform x:TypeArguments=""Thickness"">
-                                    <On Platform=""iOS"" Value=""-5,0,-5,0"" />
-                                    <On Platform=""Android"" Value=""-5,0,-5,0"" />
-                                </OnPlatform>
-                            </controls:AudioSlider.Margin>
-                        </controls:AudioSlider>
-                        <Label Text=""{Binding TicksLeft, Converter={StaticResource SecondsToTimeConverter}}"" Margin=""5,0,0,0"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""End"" />
+                        <Label Text=""{Binding Ticks}"" Margin=""0,0,5,0"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""Start"" />
+                        <Slider HorizontalOptions=""FillAndExpand"" VerticalOptions=""Center"" HeightRequest=""4"" Minimum=""0"" Maximum=""{Binding Song.LengthInSeconds}"" Value=""{Binding Ticks, Mode=TwoWay}"">
+                        </Slider>
+                        <Label Text=""{Binding TicksLeft}"" Margin=""5,0,0,0"" TextColor=""#adaeb2"" FontSize=""10"" HorizontalOptions=""End"" />
                     </StackLayout>
                     <StackLayout Orientation=""Horizontal"" HorizontalOptions=""Center"">
-                        <Image VerticalOptions=""Center"" Margin=""0,0,30,0"" Source=""button_shuffle"" />
-                        <Image VerticalOptions=""Center"" Source=""button_back"" />
-                        <Image VerticalOptions=""Center"" Source=""button_play"">
+                        <Image VerticalOptions=""Center"" Margin=""0,0,30,0"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_shuffle%402x.png"" />
+                        <Image VerticalOptions=""Center"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_back%402x.png"" />
+                        <Image VerticalOptions=""Center"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_play%402x.png"">
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer  Command=""{Binding PlayCommand}""/>
                             </Image.GestureRecognizers>
                             <Image.Triggers>
                                 <DataTrigger TargetType=""Image"" Binding=""{Binding IsPlaying}"" Value=""true"">
-                                    <Setter Property=""Source"" Value=""button_pause"" />
+                                    <Setter Property=""Source"" Value=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_pause%402x.png"" />
                                 </DataTrigger>
                                 <DataTrigger TargetType=""Image"" Binding=""{Binding IsPlaying}"" Value=""false"">
-                                    <Setter Property=""Source"" Value=""button_play"" />
+                                    <Setter Property=""Source"" Value=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_play%402x.png"" />
                                 </DataTrigger>
                             </Image.Triggers>
                         </Image>
-                        <Image VerticalOptions=""Center"" Source=""button_forward"" />
-                        <Image VerticalOptions=""Center"" Margin=""30,0,0,0"" Source=""button_repeat"" />
+                        <Image VerticalOptions=""Center"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_forward%402x.png"" />
+                        <Image VerticalOptions=""Center"" Margin=""30,0,0,0"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_raw%402x.png"" />
                     </StackLayout>
                     <StackLayout Orientation=""Horizontal"" HorizontalOptions=""Center"">
                         <StackLayout.Margin>
@@ -132,14 +118,14 @@ namespace  Xamarin.Forms.Previewer
                                 <On Platform=""iOS"" Value=""0,10,0,0""/>
                             </OnPlatform>
                         </StackLayout.Margin>
-                        <Image Source=""icon_devices"" WidthRequest=""20"" />
+                        <Image Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/icon_devices%402x.png"" WidthRequest=""20"" />
                         <Label TextColor=""White"" HorizontalTextAlignment=""Center"" Margin=""-5,0,0,0"" FontSize=""11"" Text=""Devices Available"" />
                     </StackLayout>
                 </StackLayout>
             </Grid>
-        </controls:PaddedScrollView>
+        </ScrollView>
 	</ContentPage.Content>
-</controls:ModalPage>";
+</ContentPage>";
 		public static string XamlSimpleString = @"<ContentPage xmlns=""http://xamarin.com/schemas/2014/forms""
              xmlns:x=""http://schemas.microsoft.com/winfx/2009/xaml""
              x:Class=""XamlSamples.GridDemoPage""
