@@ -1,5 +1,6 @@
 ﻿using SkiaSharp;
 using System;
+using System.Linq;
 using Xamarin.Forms.Internals;
 
 namespace Xamarin.Forms.Platform.Skia
@@ -13,37 +14,35 @@ namespace Xamarin.Forms.Platform.Skia
 			if (view is Button || view is Label)
 			{
 				string text = null;
-				float textSize = 0;
+				TextDrawingData drawingData = null;
 				if (view is Button button)
 				{
 					text = button.Text;
-					textSize = (float)button.FontSize;
+
+					drawingData = new TextDrawingData
+					{
+						Color = button.TextColor,
+						FontSize = button.FontSize,
+						Wrapping = LineBreakMode.NoWrap,
+					};
 				}
 				else if (view is Label label)
 				{
 					text = label.Text;
-					textSize = (float)label.FontSize;
+					drawingData = new TextDrawingData
+					{
+						Color = label.TextColor,
+						FontSize = label.FontSize,
+						Wrapping = label.LineBreakMode,
+					};
 				}
+				drawingData.Rect = new Rectangle(0, 0,
+					double.IsPositiveInfinity(widthConstraint) ? float.MaxValue : widthConstraint,
+					double.IsPositiveInfinity(heightConstraint) ? float.MaxValue : heightConstraint);
 
-				var paint = new SKPaint
-				{
-					TextSize = textSize,
-					IsAntialias = true
-				};
+				Forms.GetTextLayout(text, drawingData, true, out var lines);
 
-				float lineHeight = paint.TextSize * 1.25f;
-				float measuredWidth = 0;
-				float measuredHeight = 0;
-				while (!string.IsNullOrWhiteSpace(text))
-				{
-					paint.BreakText(text, (float)widthConstraint, out var mWidth, out var mText);
-
-					measuredHeight += lineHeight;
-					text = text.Substring(mText.Length);
-					measuredWidth = Math.Max(mWidth, measuredWidth);
-				}
-
-				var size = new Size(measuredWidth, measuredHeight);
+				var size = new Size(lines.Max(l => l.Width), lines.Sum(l => l.Height));
 
 				if (view is Button)
 					size += new Size(10, 10);

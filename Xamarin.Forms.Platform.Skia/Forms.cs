@@ -122,7 +122,15 @@ namespace Xamarin.Forms.Platform.Skia
 			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFillPaint);
 			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFramePaint);
 
-			DrawText(button.Text, canvas, button.TextColor, button.FontSize, button.X, button.Y);
+			DrawText(button.Text, canvas, new TextDrawingData
+			{
+				Color = button.TextColor,
+				FontSize = button.FontSize,
+				HAlign = TextAlignment.Center,
+				VAlign = TextAlignment.Center,
+				Rect = button.Bounds,
+				Wrapping = LineBreakMode.NoWrap,
+			});
 		}
 
 		private static void DrawText(string text, SKCanvas canvas, Color textColor, double fontSize, double x, double y)
@@ -148,13 +156,29 @@ namespace Xamarin.Forms.Platform.Skia
 				Rect = label.Bounds,
 				FontSize = label.FontSize,
 				Wrapping = label.LineBreakMode,
+				HAlign = label.HorizontalTextAlignment,
+				VAlign = label.VerticalTextAlignment,
 			});
 		}
 
-		private static void DrawText(string text, SKCanvas canvas, TextDrawingData data)
+		public class LineInfo
 		{
-			canvas.Save();
+			public string Text { get; set; }
+			public float Width { get; set; }
+			public SKPoint Origin { get; set; }
+			public float Height { get; set; }
 
+			public LineInfo(string text, float width, float height, SKPoint origin)
+			{
+				Text = text;
+				Width = width;
+				Origin = origin;
+				Height = height;
+			}
+		}
+
+		public static void GetTextLayout (string text, TextDrawingData data, bool measure, out List<LineInfo> lines)
+		{
 			var maxWidth = data.Rect.Width;
 
 			var lineHeight = (float)data.FontSize * 1.25f;
@@ -166,13 +190,11 @@ namespace Xamarin.Forms.Platform.Skia
 				TextSize = (float)data.FontSize
 			};
 
-			List<string> lines = new List<string>();
+			lines = new List<LineInfo>();
 
 			var remaining = text;
-
-
-			canvas.ClipRect(data.Rect.ToSKRect());
-
+			float y = paint.TextSize + (float)data.Rect.Top;
+			float x = (float)data.Rect.Left;
 			while (!string.IsNullOrEmpty(remaining))
 			{
 				paint.BreakText(remaining, (float)maxWidth, out var measuredWidth, out var measuredText);
@@ -182,7 +204,7 @@ namespace Xamarin.Forms.Platform.Skia
 
 				if (data.Wrapping == LineBreakMode.NoWrap)
 				{
-					lines.Add(measuredText);
+					lines.Add(new LineInfo(measuredText, measuredWidth, lineHeight, new SKPoint(x, y)));
 					break;
 				}
 				else if (data.Wrapping == LineBreakMode.WordWrap)
@@ -193,13 +215,13 @@ namespace Xamarin.Forms.Platform.Skia
 						{
 							if (char.IsWhiteSpace(measuredText[i]))
 							{
-								measuredText = measuredText.Substring(0, i+1);
+								measuredText = measuredText.Substring(0, i + 1);
 								break;
 							}
 						}
 					}
 
-					lines.Add(measuredText);
+					lines.Add(new LineInfo(measuredText, paint.MeasureText(measuredText), lineHeight, new SKPoint(x, y)));
 				}
 				else if (data.Wrapping == LineBreakMode.HeadTruncation)
 				{
@@ -207,9 +229,7 @@ namespace Xamarin.Forms.Platform.Skia
 				}
 				else if (data.Wrapping == LineBreakMode.TailTruncation)
 				{
-					measuredText = measuredText.Substring(0, Math.Max(0, measuredText.Length - 2)) + "...";
-					lines.Add(measuredText);
-					break;
+					throw new NotImplementedException();
 				}
 				else if (data.Wrapping == LineBreakMode.MiddleTruncation)
 				{
@@ -217,19 +237,62 @@ namespace Xamarin.Forms.Platform.Skia
 				}
 
 				remaining = remaining.Substring(measuredText.Length);
+
+				y += lineHeight;
 			}
 
-			var y = (float)data.Rect.Top;
-			y += paint.TextSize;
+			if (lines.Count > 0 && !measure && (data.VAlign != TextAlignment.Start || data.HAlign != TextAlignment.Start))
+			{
+				float vOffset = 0;
+				switch (data.VAlign)
+				{
+					case TextAlignment.Center:
+						vOffset = (float)(data.Rect.Height - (lines.Count * lineHeight)) / 2f;
+						break;
+					case TextAlignment.End:
+						vOffset = (float)(data.Rect.Height - (lines.Count * lineHeight));
+						break;
+				}
+
+				foreach (var line in lines)
+				{
+					float hOffset = 0;
+					switch (data.HAlign)
+					{
+						case TextAlignment.Center:
+							hOffset = (float)((data.Rect.Width - line.Width) / 2);
+							break;
+						case TextAlignment.End:
+							hOffset = (float)(data.Rect.Width - line.Width);
+							break;
+					}
+
+					line.Origin = new SKPoint(line.Origin.X + hOffset, line.Origin.Y + vOffset);
+				}
+			}
+		}
+
+		private static void DrawText(string text, SKCanvas canvas, TextDrawingData data)
+		{
+			canvas.Save();
+
+			var paint = new SKPaint
+			{
+				Color = data.Color.ToSKColor(Color.Black),
+				IsAntialias = true,
+				TextSize = (float)data.FontSize
+			};
+
+			canvas.ClipRect(data.Rect.ToSKRect());
+
+			GetTextLayout(text, data, false, out var lines);
 
 			foreach (var line in lines)
 			{
-				if (!string.IsNullOrWhiteSpace(line))
+				if (!string.IsNullOrWhiteSpace(line.Text))
 				{
-					canvas.DrawText(line, (float)data.Rect.X, y, paint);
+					canvas.DrawText(line.Text, line.Origin, paint);
 				}
-
-				y += lineHeight;
 			}
 
 			canvas.Restore();
