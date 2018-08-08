@@ -95,7 +95,7 @@ namespace Xamarin.Forms.Platform.Skia
 
 		public IIsolatedStorageFile GetUserStoreForApplication()
 		{
-			return new _IsolatedStorageFile(IsolatedStorageFile.GetUserStoreForApplication());
+			return new _IsolatedStorageFile(IsolatedStorageFile.GetUserStoreForAssembly());
 		}
 
 		public void OpenUriAction(Uri uri)

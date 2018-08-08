@@ -156,6 +156,7 @@ namespace Xamarin.Forms.Platform.Skia
 			canvas.Save();
 
 			var maxWidth = data.Rect.Width;
+
 			var lineHeight = (float)data.FontSize * 1.25f;
 
 			var paint = new SKPaint
@@ -175,6 +176,9 @@ namespace Xamarin.Forms.Platform.Skia
 			while (!string.IsNullOrEmpty(remaining))
 			{
 				paint.BreakText(remaining, (float)maxWidth, out var measuredWidth, out var measuredText);
+
+				if (measuredText.Length == 0)
+					break;
 
 				if (data.Wrapping == LineBreakMode.NoWrap)
 				{
