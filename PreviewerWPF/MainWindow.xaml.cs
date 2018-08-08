@@ -33,6 +33,7 @@ namespace PreviewerWPF
 
 			InitializeComponent();
 			sizeComboBox.SelectedIndex = 0;
+			sampleComboBox.SelectedIndex = 0;
 			XamlEntry.Text = XamlParser.XamlSimpleString;
 			Previewer.Redraw += Previewer_Redraw;
 		}
@@ -60,6 +61,12 @@ namespace PreviewerWPF
 		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			Render();
+		}
+
+		private void sampleComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			var sample = XamlParser.Samples[Math.Max(sampleComboBox.SelectedIndex,0)];
+			XamlEntry.Text = sample.Xaml;
 		}
 	}
 }

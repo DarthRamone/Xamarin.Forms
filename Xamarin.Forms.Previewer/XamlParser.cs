@@ -199,11 +199,25 @@ namespace  Xamarin.Forms.Previewer
     </Grid>
 </ContentPage>";
 
-		public static (string Description, string Xaml)[] Samples = {
-			("Simple",XamlSimpleString),
-			("Complex", XamlComplexSampleString),
-			("Playback Screen", XamlPlaybackScreen)
+		public static XamlSample[] Samples = {
+			new XamlSample("Simple",XamlSimpleString),
+			new XamlSample("Complex", XamlComplexSampleString),
+			new XamlSample("Playback Screen", XamlPlaybackScreen)
 		};
+		public class XamlSample
+		{
+			public XamlSample()
+			{
+
+			}
+			public XamlSample(string description, string xaml)
+			{
+				Description = description;
+				Xaml = xaml;
+			}
+			public string Description { get; set; }
+			public string Xaml { get; set; }
+		}
 
 		public static (Element element, Exception error) ParseXaml(string xaml)
 		{
