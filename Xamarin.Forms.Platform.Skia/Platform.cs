@@ -1,13 +1,5 @@
 ﻿using SkiaSharp;
 using System;
-using System.IO;
-using System.IO.IsolatedStorage;
-using System.Net.Http;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Xamarin.Forms.Internals;
 
 namespace Xamarin.Forms.Platform.Skia
@@ -18,36 +10,36 @@ namespace Xamarin.Forms.Platform.Skia
 		{
 			SizeRequest? result = null;
 
-			if (view is Button button)
+			if (view is Button || view is Label)
 			{
-				var text = button.Text;
+				string text = null;
+				float textSize = 0;
+				if (view is Button button)
+				{
+					text = button.Text;
+					textSize = (float)button.FontSize;
+				}
+				else if (view is Label label)
+				{
+					text = label.Text;
+					textSize = (float)label.FontSize;
+				}
 
 				var paint = new SKPaint
 				{
-					TextSize = (float)button.FontSize,
+					TextSize = textSize,
 					IsAntialias = true
 				};
 
 				var bounds = new SKRect();
 				paint.MeasureText(text, ref bounds);
 
-				bounds.Inflate(10, 10);
-				return new SizeRequest(new Size(bounds.Width, bounds.Height));
-			}
-			else if (view is Label label)
-			{
-				var text = label.Text;
+				var size = new Size(bounds.Width, paint.TextSize * 1.25);
 
-				var paint = new SKPaint
-				{
-					TextSize = (float)label.FontSize,
-					IsAntialias = true
-				};
+				if (view is Button)
+					size += new Size(10, 10);
 
-				var bounds = new SKRect();
-				paint.MeasureText(text, ref bounds);
-
-				return new SizeRequest(new Size(bounds.Width, bounds.Height));
+				return new SizeRequest(size);
 			}
 			else if (view is Image image)
 			{

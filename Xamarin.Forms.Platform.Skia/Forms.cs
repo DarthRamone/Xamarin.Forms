@@ -57,21 +57,90 @@ namespace Xamarin.Forms.Platform.Skia
 			{
 				DrawLabel(label, canvas);
 			}
+			else if (element is Button button)
+			{
+				DrawButton(button, canvas);
+			}
+		}
+
+		private static void DrawVisualElement(VisualElement ve, SKCanvas canvas)
+		{
+			var paint = new SKPaint();
+			paint.Color = ve.BackgroundColor.ToSKColor(Color.Transparent);
+			canvas.DrawRect(ve.Bounds.ToSKRect(), paint);
 		}
 
 		private static void DrawContentPage(ContentPage page, SKCanvas canvas)
 		{
-			canvas.Clear(page.BackgroundColor.ToSKColor());
+			DrawVisualElement(page, canvas);
+		}
+
+		private static void DrawButton(Button button, SKCanvas canvas)
+		{
+			//-----------------------------------------------------------------------------
+			// Draw Group shape group
+			// Shadow color for RoundRectangleStyleFill
+			var RoundRectangleStyleFillShadowColor = new SKColor(0, 0, 0, 20);
+
+			// Build shadow for RoundRectangleStyleFill
+			var RoundRectangleStyleFillShadow = SKImageFilter.CreateDropShadow(0, 0, 4, 4, RoundRectangleStyleFillShadowColor, SKDropShadowImageFilterShadowMode.DrawShadowAndForeground, null, null);
+
+			// Fill color for Round Rectangle Style
+			var RoundRectangleStyleFillColor = button.BackgroundColor.ToSKColor(new Color(0.7));
+
+			// New Round Rectangle Style fill paint
+			var RoundRectangleStyleFillPaint = new SKPaint()
+			{
+				Style = SKPaintStyle.Fill,
+				Color = RoundRectangleStyleFillColor,
+				BlendMode = SKBlendMode.SrcOver,
+				IsAntialias = true,
+				ImageFilter = RoundRectangleStyleFillShadow
+			};
+
+			// Frame color for Round Rectangle Style
+			var RoundRectangleStyleFrameColor = button.BorderColor.ToSKColor();
+
+			// New Round Rectangle Style frame paint
+			var RoundRectangleStyleFramePaint = new SKPaint()
+			{
+				Style = SKPaintStyle.Stroke,
+				Color = RoundRectangleStyleFrameColor,
+				BlendMode = SKBlendMode.SrcOver,
+				IsAntialias = true,
+				StrokeWidth = (float)button.BorderWidth,
+			};
+
+			float rounding = (float)button.CornerRadius;
+			if (rounding < 0)
+				rounding = 0;
+
+			// Draw Round Rectangle shape
+			var bounds = button.Bounds.Inflate(-4, -4);
+
+			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFillPaint);
+			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFramePaint);
+
+			DrawText(button.Text, canvas, button.TextColor, button.FontSize, button.X, button.Y);
+		}
+
+		private static void DrawText(string text, SKCanvas canvas, Color textColor, double fontSize, double x, double y)
+		{
+			var paint = new SKPaint
+			{
+				Color = textColor.ToSKColor(),
+				IsAntialias = true,
+				TextSize = (float)fontSize,
+			};
+
+			canvas.DrawText(text, (float)x, (float)y + paint.TextSize, paint);
 		}
 
 		private static void DrawLabel(Label label, SKCanvas canvas)
 		{
-			var paint = new SKPaint();
-			paint.Color = label.TextColor.ToSKColor();
-			paint.IsAntialias = true;
-			paint.TextSize = (float)label.FontSize;
+			DrawVisualElement(label, canvas);
 
-			canvas.DrawText(label.Text, new SKPoint((float)label.X, (float)label.Y), paint);
+			DrawText(label.Text, canvas, label.TextColor, label.FontSize, label.X, label.Y);
 		}
 	}
 }
