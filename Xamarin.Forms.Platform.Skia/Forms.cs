@@ -132,8 +132,8 @@ namespace Xamarin.Forms.Platform.Skia
 				IsAntialias = true,
 				TextSize = (float)fontSize,
 			};
-
-			canvas.DrawText(text, (float)x, (float)y + paint.TextSize, paint);
+			if(!string.IsNullOrWhiteSpace(text))
+				canvas.DrawText(text, (float)x, (float)y + paint.TextSize, paint);
 		}
 
 		private static void DrawLabel(Label label, SKCanvas canvas)

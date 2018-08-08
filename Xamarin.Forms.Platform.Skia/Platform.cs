@@ -32,7 +32,8 @@ namespace Xamarin.Forms.Platform.Skia
 				};
 
 				var bounds = new SKRect();
-				paint.MeasureText(text, ref bounds);
+				if(!string.IsNullOrWhiteSpace(text))
+					paint.MeasureText(text, ref bounds);
 
 				var size = new Size(bounds.Width, paint.TextSize * 1.25);
 
