@@ -40,7 +40,7 @@ namespace Xamarin.Forms.Platform.Skia
 					double.IsPositiveInfinity(widthConstraint) ? float.MaxValue : widthConstraint,
 					double.IsPositiveInfinity(heightConstraint) ? float.MaxValue : heightConstraint);
 
-				Forms.GetTextLayout(text, drawingData, out var lines);
+				Forms.GetTextLayout(text, drawingData, true, out var lines);
 
 				var size = new Size(lines.Max(l => l.Width), lines.Sum(l => l.Height));
 

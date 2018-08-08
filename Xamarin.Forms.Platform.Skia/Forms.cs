@@ -122,7 +122,15 @@ namespace Xamarin.Forms.Platform.Skia
 			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFillPaint);
 			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFramePaint);
 
-			DrawText(button.Text, canvas, button.TextColor, button.FontSize, button.X, button.Y);
+			DrawText(button.Text, canvas, new TextDrawingData
+			{
+				Color = button.TextColor,
+				FontSize = button.FontSize,
+				HAlign = TextAlignment.Center,
+				VAlign = TextAlignment.Center,
+				Rect = button.Bounds,
+				Wrapping = LineBreakMode.NoWrap,
+			});
 		}
 
 		private static void DrawText(string text, SKCanvas canvas, Color textColor, double fontSize, double x, double y)
@@ -148,6 +156,8 @@ namespace Xamarin.Forms.Platform.Skia
 				Rect = label.Bounds,
 				FontSize = label.FontSize,
 				Wrapping = label.LineBreakMode,
+				HAlign = label.HorizontalTextAlignment,
+				VAlign = label.VerticalTextAlignment,
 			});
 		}
 
@@ -167,7 +177,7 @@ namespace Xamarin.Forms.Platform.Skia
 			}
 		}
 
-		public static void GetTextLayout (string text, TextDrawingData data, out List<LineInfo> lines)
+		public static void GetTextLayout (string text, TextDrawingData data, bool measure, out List<LineInfo> lines)
 		{
 			var maxWidth = data.Rect.Width;
 
@@ -230,6 +240,36 @@ namespace Xamarin.Forms.Platform.Skia
 
 				y += lineHeight;
 			}
+
+			if (lines.Count > 0 && !measure && (data.VAlign != TextAlignment.Start || data.HAlign != TextAlignment.Start))
+			{
+				float vOffset = 0;
+				switch (data.VAlign)
+				{
+					case TextAlignment.Center:
+						vOffset = (float)(data.Rect.Height - (lines.Count * lineHeight)) / 2f;
+						break;
+					case TextAlignment.End:
+						vOffset = (float)(data.Rect.Height - (lines.Count * lineHeight));
+						break;
+				}
+
+				foreach (var line in lines)
+				{
+					float hOffset = 0;
+					switch (data.HAlign)
+					{
+						case TextAlignment.Center:
+							hOffset = (float)((data.Rect.Width - line.Width) / 2);
+							break;
+						case TextAlignment.End:
+							hOffset = (float)(data.Rect.Width - line.Width);
+							break;
+					}
+
+					line.Origin = new SKPoint(line.Origin.X + hOffset, line.Origin.Y + vOffset);
+				}
+			}
 		}
 
 		private static void DrawText(string text, SKCanvas canvas, TextDrawingData data)
@@ -245,7 +285,7 @@ namespace Xamarin.Forms.Platform.Skia
 
 			canvas.ClipRect(data.Rect.ToSKRect());
 
-			GetTextLayout(text, data, out var lines);
+			GetTextLayout(text, data, false, out var lines);
 
 			foreach (var line in lines)
 			{
