@@ -20,6 +20,7 @@ namespace PreviewerMac
 		NSTextView xamlEntry;
 		IPreviewer previewer;
 		NSView nativePreviewView;
+		NSScrollView textScroller;
 
 
 		public PreviewerView()
@@ -42,20 +43,35 @@ namespace PreviewerMac
 		{
 			//Layer.BackgroundColor = NSColor.Blue.CGColor;
 			AddSubview(rendererPicker = new NSPopUpButton());
-			rendererPicker.AddItem("Skia");
+			XamlParser.Samples.ToList().ForEach(x => rendererPicker.AddItem(x.Description));
+			rendererPicker.Activated += (object sender, EventArgs e) =>
+			{
+				var start = DateTime.Now;
+				xamlEntry.TextStorage.SetString(new NSAttributedString(XamlParser.Samples[rendererPicker.IndexOfSelectedItem].Xaml));
+				Console.WriteLine($"Setting Text took: {(DateTime.Now - start).TotalMilliseconds}");
+				Refresh();
+			};
+
 			AddSubview(sizePicker = new NSPopUpButton());
 			ScreenSize.Sizes.ToList().ForEach(x => sizePicker.AddItem(x.Description));
 			sizePicker.Activated += (object sender, EventArgs e) => Refresh();
-			AddSubview(xamlEntry = new NSTextView
+
+			AddSubview(textScroller = new NSScrollView
 			{
-				BackgroundColor = NSColor.White,
-				TextColor = NSColor.Black,
-				AutomaticQuoteSubstitutionEnabled=false,
+				DocumentView = (xamlEntry = new NSTextView
+				{
+					BackgroundColor = NSColor.White,
+					TextColor = NSColor.Black,
+					AutomaticQuoteSubstitutionEnabled = false,
+					VerticallyResizable = true,
+					HorizontallyResizable = true,
+					MaxSize = new CGSize(nfloat.MaxValue,nfloat.MaxValue),
+				}),
 			});
 
 			xamlEntry.TextDidChange += XamlEntry_Changed;
 			previewer = new SkiaPreviewer();
-			xamlEntry.TextStorage.SetString (new NSAttributedString(XamlParser.XamlSimpleString));
+			xamlEntry.TextStorage.SetString(new NSAttributedString(XamlParser.Samples[rendererPicker.IndexOfSelectedItem].Xaml));
 			AddSubview(nativePreviewView = previewer as NSView);
 			Refresh();
 
@@ -67,10 +83,14 @@ namespace PreviewerMac
 		}
 		void Refresh()
 		{
+			var start = DateTime.Now;
 			var xaml = xamlEntry.TextStorage.Value;
 			var (element, error) = String.IsNullOrEmpty(xaml) ? (null,null) : XamlParser.ParseXaml(xaml);
+			Console.WriteLine($"Parsing Xaml took: {(DateTime.Now - start).TotalMilliseconds}");
 			var size = ScreenSize.Sizes[sizePicker.IndexOfSelectedItem];
+			start = DateTime.Now;
 			previewer.Draw(element, size.Width, size.Height);
+			Console.WriteLine($"Drawing took: {(DateTime.Now - start).TotalMilliseconds}");
 		}
 
 
@@ -99,7 +119,7 @@ namespace PreviewerMac
 			var top = topHeight;
 			var sideHeight = this.Bounds.Height - top;
 			frame = new CGRect(padding, top, half - doublePadding, sideHeight);
-			xamlEntry.Frame = frame;
+			textScroller.Frame = frame;
 
 			frame.X = half + padding;
 			nativePreviewView.Frame = frame;

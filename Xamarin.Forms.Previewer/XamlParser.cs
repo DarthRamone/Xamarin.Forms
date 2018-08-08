@@ -198,6 +198,13 @@ namespace  Xamarin.Forms.Previewer
 
     </Grid>
 </ContentPage>";
+
+		public static (string Description, string Xaml)[] Samples = {
+			("Simple",XamlSimpleString),
+			("Complex", XamlComplexSampleString),
+			("Playback Screen", XamlPlaybackScreen)
+		};
+
 		public static (Element element, Exception error) ParseXaml(string xaml)
 		{
 			try
