@@ -59,13 +59,15 @@ namespace Xamarin.Forms.Platform.Skia
 						multiplier = 3;
 					}
 					var bitmap = ImageCache.TryGetValue(url);
-					if(bitmap != null)
+					if (bitmap != null)
 					{
 						return new SizeRequest(new Size(bitmap.Width/multiplier, bitmap.Height/multiplier));
 					}
 				}
 				return new SizeRequest(new Size(100, 100));
 			}
+			else
+				result = new SizeRequest(new Size(100, 100));
 
 			if (result == null)
 				throw new NotImplementedException();

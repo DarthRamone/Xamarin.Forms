@@ -291,6 +291,10 @@ namespace Xamarin.Forms.Platform.Skia
 			{
 				DrawImage(image, canvas, drawRequest, redraw);
 			}
+			else if (element is VisualElement ve)
+			{
+				DrawVisualElement(ve, canvas);
+			}
 		}
 
 		private static void DrawLabel(Label label, SKCanvas canvas)
