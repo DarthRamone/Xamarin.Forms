@@ -37,20 +37,22 @@ namespace Xamarin.Forms.Platform.Skia
 				ve.Layout(region);
 			}
 
-			Stack<Element> drawStack = new Stack<Element>();
-			drawStack.Push(element);
+			//Stack<Element> drawStack = new Stack<Element>();
+			//drawStack.Push(element);
 
-			while (drawStack.Count > 0)
-			{
-				var current = drawStack.Pop();
+			DrawElement(element, canvas, currentDrawRequest, redraw);
 
-				foreach (var child in current.LogicalChildren)
-				{
-					drawStack.Push(child);
-				}
+			//while (drawStack.Count > 0)
+			//{
+			//	var current = drawStack.Pop();
 
-				DrawElement(current, canvas, currentDrawRequest,redraw);
-			}
+			//	foreach (var child in current.LogicalChildren)
+			//	{
+			//		drawStack.Push(child);
+			//	}
+
+				
+			//}
 		}
 
 		public static void GetTextLayout(string text, TextDrawingData data, bool measure, out List<LineInfo> lines)
@@ -167,7 +169,11 @@ namespace Xamarin.Forms.Platform.Skia
 				{
 					var success = await ImageCache.LoadImage(url, drawRequest);
 					if (success && drawRequest == currentDrawRequest)
+					{
+						image.InvalidateMeasureNonVirtual(InvalidationTrigger.Undefined);
 						redraw?.Invoke();
+					}
+
 					return;
 				}
 			}
@@ -288,6 +294,18 @@ namespace Xamarin.Forms.Platform.Skia
 			{
 				DrawVisualElement(ve, canvas);
 			}
+
+			canvas.Save();
+
+			if (element is VisualElement v)
+				canvas.Translate((float)v.Bounds.X, (float)v.Bounds.Y);
+
+			foreach (var child in element.LogicalChildren)
+			{
+				DrawElement(child, canvas, drawRequest, redraw);
+			}
+
+			canvas.Restore();
 		}
 
 		private static void DrawLabel(Label label, SKCanvas canvas)

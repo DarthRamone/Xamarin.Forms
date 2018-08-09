@@ -64,7 +64,7 @@ namespace Xamarin.Forms.Platform.Skia
 						return new SizeRequest(new Size(bitmap.Width/multiplier, bitmap.Height/multiplier));
 					}
 				}
-				return new SizeRequest(new Size(100, 100));
+				return new SizeRequest(new Size(10, 10));
 			}
 			else
 				result = new SizeRequest(new Size(100, 100));
