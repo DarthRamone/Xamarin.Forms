@@ -19,22 +19,12 @@ namespace Xamarin.Forms.Platform.Skia
 				{
 					text = button.Text;
 
-					drawingData = new TextDrawingData
-					{
-						Color = button.TextColor,
-						FontSize = button.FontSize,
-						Wrapping = LineBreakMode.NoWrap,
-					};
+					drawingData = new TextDrawingData(button);
 				}
 				else if (view is Label label)
 				{
 					text = label.Text;
-					drawingData = new TextDrawingData
-					{
-						Color = label.TextColor,
-						FontSize = label.FontSize,
-						Wrapping = label.LineBreakMode,
-					};
+					drawingData = new TextDrawingData(label);
 				}
 				drawingData.Rect = new Rectangle(0, 0,
 					double.IsPositiveInfinity(widthConstraint) ? float.MaxValue : widthConstraint,
@@ -42,7 +32,11 @@ namespace Xamarin.Forms.Platform.Skia
 
 				Forms.GetTextLayout(text, drawingData, true, out var lines);
 
-				var size = new Size(lines.Max(l => l.Width), lines.Sum(l => l.Height));
+				Size size;
+				if (lines.Count > 0)
+					size = new Size(lines.Max(l => l.Width), lines.Sum(l => l.Height));
+				else
+					size = new Size();
 
 				if (view is Button)
 					size += new Size(10, 10);

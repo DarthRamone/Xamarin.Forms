@@ -5,18 +5,11 @@ using Xamarin.Forms.Internals;
 
 namespace Xamarin.Forms.Platform.Skia
 {
-
 	public static class Forms
 	{
 		public static IPlatform Platform = new Platform();
 
-		public static void Init ()
-		{
-			Device.PlatformServices = new SkiaPlatformServices();
-			Device.Info = new SkiaDeviceInfo();
-		}
-
-		public static void Draw (Element element, Rectangle region, SKSurface surface, Action redraw )
+		public static void Draw (Element element, Rectangle region, SKSurface surface, Action redraw)
 		{
 			var canvas = surface.Canvas;
 
@@ -35,7 +28,7 @@ namespace Xamarin.Forms.Platform.Skia
 			Stack<Element> drawStack = new Stack<Element>();
 			drawStack.Push(element);
 
-			while(drawStack.Count > 0)
+			while (drawStack.Count > 0)
 			{
 				var current = drawStack.Pop();
 
@@ -48,140 +41,11 @@ namespace Xamarin.Forms.Platform.Skia
 			}
 		}
 
-		private static void DrawElement(Element element, SKCanvas canvas)
-		{
-			if (element is ContentPage page)
-			{
-				DrawContentPage(page, canvas);
-			}
-			else if (element is Label label)
-			{
-				DrawLabel(label, canvas);
-			}
-			else if (element is Button button)
-			{
-				DrawButton(button, canvas);
-			}
-		}
-
-		private static void DrawVisualElement(VisualElement ve, SKCanvas canvas)
-		{
-			var paint = new SKPaint();
-			paint.Color = ve.BackgroundColor.ToSKColor(Color.Transparent);
-			canvas.DrawRect(ve.Bounds.ToSKRect(), paint);
-		}
-
-		private static void DrawContentPage(ContentPage page, SKCanvas canvas)
-		{
-			DrawVisualElement(page, canvas);
-		}
-
-		private static void DrawButton(Button button, SKCanvas canvas)
-		{
-			//-----------------------------------------------------------------------------
-			// Draw Group shape group
-			// Shadow color for RoundRectangleStyleFill
-			var RoundRectangleStyleFillShadowColor = new SKColor(0, 0, 0, 20);
-
-			// Build shadow for RoundRectangleStyleFill
-			var RoundRectangleStyleFillShadow = SKImageFilter.CreateDropShadow(0, 0, 4, 4, RoundRectangleStyleFillShadowColor, SKDropShadowImageFilterShadowMode.DrawShadowAndForeground, null, null);
-
-			// Fill color for Round Rectangle Style
-			var RoundRectangleStyleFillColor = button.BackgroundColor.ToSKColor(Color.Transparent);
-
-			// New Round Rectangle Style fill paint
-			var RoundRectangleStyleFillPaint = new SKPaint()
-			{
-				Style = SKPaintStyle.Fill,
-				Color = RoundRectangleStyleFillColor,
-				BlendMode = SKBlendMode.SrcOver,
-				IsAntialias = true,
-				ImageFilter = RoundRectangleStyleFillShadow
-			};
-
-			// Frame color for Round Rectangle Style
-			var RoundRectangleStyleFrameColor = button.BorderColor.ToSKColor();
-
-			// New Round Rectangle Style frame paint
-			var RoundRectangleStyleFramePaint = new SKPaint()
-			{
-				Style = SKPaintStyle.Stroke,
-				Color = RoundRectangleStyleFrameColor,
-				BlendMode = SKBlendMode.SrcOver,
-				IsAntialias = true,
-				StrokeWidth = (float)button.BorderWidth,
-			};
-
-			float rounding = (float)button.CornerRadius;
-			if (rounding < 0)
-				rounding = 0;
-
-			// Draw Round Rectangle shape
-			var bounds = button.Bounds.Inflate(-4, -4);
-
-			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFillPaint);
-			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFramePaint);
-
-			DrawText(button.Text, canvas, new TextDrawingData
-			{
-				Color = button.TextColor,
-				FontSize = button.FontSize,
-				HAlign = TextAlignment.Center,
-				VAlign = TextAlignment.Center,
-				Rect = button.Bounds,
-				Wrapping = LineBreakMode.NoWrap,
-			});
-		}
-
-		private static void DrawText(string text, SKCanvas canvas, Color textColor, double fontSize, double x, double y)
-		{
-			var paint = new SKPaint
-			{
-				Color = textColor.ToSKColor(),
-				IsAntialias = true,
-				TextSize = (float)fontSize,
-			};
-
-			if(!string.IsNullOrWhiteSpace(text))
-				canvas.DrawText(text, (float)x, (float)y + paint.TextSize, paint);
-		}
-
-		private static void DrawLabel(Label label, SKCanvas canvas)
-		{
-			DrawVisualElement(label, canvas);
-
-			DrawText(label.Text, canvas, new TextDrawingData()
-			{
-				Color = label.TextColor,
-				Rect = label.Bounds,
-				FontSize = label.FontSize,
-				Wrapping = label.LineBreakMode,
-				HAlign = label.HorizontalTextAlignment,
-				VAlign = label.VerticalTextAlignment,
-			});
-		}
-
-		public class LineInfo
-		{
-			public string Text { get; set; }
-			public float Width { get; set; }
-			public SKPoint Origin { get; set; }
-			public float Height { get; set; }
-
-			public LineInfo(string text, float width, float height, SKPoint origin)
-			{
-				Text = text;
-				Width = width;
-				Origin = origin;
-				Height = height;
-			}
-		}
-
-		public static void GetTextLayout (string text, TextDrawingData data, bool measure, out List<LineInfo> lines)
+		public static void GetTextLayout(string text, TextDrawingData data, bool measure, out List<LineInfo> lines)
 		{
 			var maxWidth = data.Rect.Width;
 
-			var lineHeight = (float)data.FontSize * 1.25f;
+			var lineHeight = (float)(data.FontSize * 1.25f * data.LineHeight);
 
 			var paint = new SKPaint
 			{
@@ -249,6 +113,7 @@ namespace Xamarin.Forms.Platform.Skia
 					case TextAlignment.Center:
 						vOffset = (float)(data.Rect.Height - (lines.Count * lineHeight)) / 2f;
 						break;
+
 					case TextAlignment.End:
 						vOffset = (float)(data.Rect.Height - (lines.Count * lineHeight));
 						break;
@@ -262,6 +127,7 @@ namespace Xamarin.Forms.Platform.Skia
 						case TextAlignment.Center:
 							hOffset = (float)((data.Rect.Width - line.Width) / 2);
 							break;
+
 						case TextAlignment.End:
 							hOffset = (float)(data.Rect.Width - line.Width);
 							break;
@@ -270,6 +136,121 @@ namespace Xamarin.Forms.Platform.Skia
 					line.Origin = new SKPoint(line.Origin.X + hOffset, line.Origin.Y + vOffset);
 				}
 			}
+		}
+
+		public static void Init()
+		{
+			Device.PlatformServices = new SkiaPlatformServices();
+			Device.Info = new SkiaDeviceInfo();
+		}
+
+		private static void DrawButton(Button button, SKCanvas canvas)
+		{
+			//-----------------------------------------------------------------------------
+			// Draw Group shape group
+			// Shadow color for RoundRectangleStyleFill
+			var RoundRectangleStyleFillShadowColor = new SKColor(0, 0, 0, 20);
+
+			// Build shadow for RoundRectangleStyleFill
+			var RoundRectangleStyleFillShadow = SKImageFilter.CreateDropShadow(0, 0, 4, 4, RoundRectangleStyleFillShadowColor, SKDropShadowImageFilterShadowMode.DrawShadowAndForeground, null, null);
+
+			// Fill color for Round Rectangle Style
+			var RoundRectangleStyleFillColor = button.BackgroundColor.ToSKColor(Color.Transparent);
+
+			// New Round Rectangle Style fill paint
+			var RoundRectangleStyleFillPaint = new SKPaint()
+			{
+				Style = SKPaintStyle.Fill,
+				Color = RoundRectangleStyleFillColor,
+				BlendMode = SKBlendMode.SrcOver,
+				IsAntialias = true,
+				ImageFilter = RoundRectangleStyleFillShadow
+			};
+
+			// Frame color for Round Rectangle Style
+			var RoundRectangleStyleFrameColor = button.BorderColor.ToSKColor();
+
+			// New Round Rectangle Style frame paint
+			var RoundRectangleStyleFramePaint = new SKPaint()
+			{
+				Style = SKPaintStyle.Stroke,
+				Color = RoundRectangleStyleFrameColor,
+				BlendMode = SKBlendMode.SrcOver,
+				IsAntialias = true,
+				StrokeWidth = (float)button.BorderWidth,
+			};
+
+			float rounding = (float)button.CornerRadius;
+			if (rounding < 0)
+				rounding = 0;
+
+			// Draw Round Rectangle shape
+			var bounds = button.Bounds.Inflate(-4, -4);
+
+			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFillPaint);
+			canvas.DrawRoundRect(bounds.ToSKRect(), rounding, rounding, RoundRectangleStyleFramePaint);
+
+			DrawText(button.Text, canvas, new TextDrawingData(button));
+		}
+
+		private static SKPath RoundedRect (Rectangle bounds, CornerRadius corners)
+		{
+			var b = bounds.ToSKRect();
+			var topLeft = (float)corners.TopLeft;
+			var topRight = (float)corners.TopRight;
+			var bottomLeft = (float)corners.BottomLeft;
+			var bottomRight = (float)corners.BottomRight;
+
+			var result = new SKPath();
+			result.MoveTo(b.Left + topLeft, b.Top);
+			result.LineTo(b.Right - topRight, b.Top);
+			result.ArcTo(b.Right - topRight, b.Top, b.Right, b.Top + topRight, topRight);
+			result.ArcTo(b.Right, b.Bottom - bottomRight, b.Right - bottomRight, b.Bottom, bottomRight);
+			result.ArcTo(b.Left + bottomLeft, b.Bottom, b.Left, b.Bottom - bottomLeft, bottomLeft);
+			result.ArcTo(b.Left, b.Top + topLeft, b.Left + topLeft, b.Top, topLeft);
+
+			return result;
+		}
+
+		private static void DrawBoxView(BoxView box, SKCanvas canvas)
+		{
+			var corner = box.CornerRadius;
+			var paint = new SKPaint();
+			paint.Color = box.Color.ToSKColor(Color.Transparent);
+
+			canvas.DrawPath(RoundedRect(box.Bounds, box.CornerRadius), paint);
+		}
+
+		private static void DrawContentPage(ContentPage page, SKCanvas canvas)
+		{
+			DrawVisualElement(page, canvas);
+		}
+
+		private static void DrawElement(Element element, SKCanvas canvas)
+		{
+			if (element is ContentPage page)
+			{
+				DrawContentPage(page, canvas);
+			}
+			else if (element is Label label)
+			{
+				DrawLabel(label, canvas);
+			}
+			else if (element is Button button)
+			{
+				DrawButton(button, canvas);
+			}
+			else if (element is BoxView box)
+			{
+				DrawBoxView(box, canvas);
+			}
+		}
+
+		private static void DrawLabel(Label label, SKCanvas canvas)
+		{
+			DrawVisualElement(label, canvas);
+
+			DrawText(label.Text, canvas, new TextDrawingData(label));
 		}
 
 		private static void DrawText(string text, SKCanvas canvas, TextDrawingData data)
@@ -297,17 +278,81 @@ namespace Xamarin.Forms.Platform.Skia
 
 			canvas.Restore();
 		}
+
+		private static void DrawVisualElement(VisualElement ve, SKCanvas canvas)
+		{
+			var paint = new SKPaint();
+			paint.Color = ve.BackgroundColor.ToSKColor(Color.Transparent);
+			canvas.DrawRect(ve.Bounds.ToSKRect(), paint);
+		}
+
+		public class LineInfo
+		{
+			public LineInfo(string text, float width, float height, SKPoint origin)
+			{
+				Text = text;
+				Width = width;
+				Origin = origin;
+				Height = height;
+			}
+
+			public float Height { get; set; }
+			public SKPoint Origin { get; set; }
+			public string Text { get; set; }
+			public float Width { get; set; }
+		}
 	}
 
 	public class TextDrawingData
 	{
-		public Color Color { get; set; }
-		public TextAlignment HAlign { get; set; }
-		public TextAlignment VAlign { get; set; }
-		public double FontSize { get; set; }
-		public Rectangle Rect { get; set; }
-		public string FontFamily { get; set; }
+		private double _lineHeight = 1.0;
+
+		public TextDrawingData()
+		{
+		}
+
+		public TextDrawingData(Label label)
+		{
+			Color = label.TextColor;
+			Rect = label.Bounds;
+			FontSize = label.FontSize;
+			Wrapping = label.LineBreakMode;
+			HAlign = label.HorizontalTextAlignment;
+			VAlign = label.VerticalTextAlignment;
+			Attributes = label.FontAttributes;
+			LineHeight = label.LineHeight;
+		}
+
+		public TextDrawingData(Button button)
+		{
+			Color = button.TextColor;
+			Rect = button.Bounds;
+			FontSize = button.FontSize;
+			Wrapping = LineBreakMode.NoWrap;
+			HAlign = TextAlignment.Center;
+			VAlign = TextAlignment.Center;
+			Attributes = button.FontAttributes;
+		}
+
 		public FontAttributes Attributes { get; set; }
+		public Color Color { get; set; }
+		public string FontFamily { get; set; }
+		public double FontSize { get; set; }
+		public TextAlignment HAlign { get; set; }
+
+		public double LineHeight
+		{
+			get { return _lineHeight; }
+			set
+			{
+				if (value < 0)
+					value = 1;
+				_lineHeight = value;
+			}
+		}
+
+		public Rectangle Rect { get; set; }
+		public TextAlignment VAlign { get; set; }
 		public LineBreakMode Wrapping { get; set; }
 	}
 }
