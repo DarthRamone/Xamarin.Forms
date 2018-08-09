@@ -24,7 +24,7 @@ namespace Xamarin.Forms.Platform.Skia
 			}
 		}
 
-		public static Task LoadImage(string url, string requestId)
+		public static Task<bool> LoadImage(string url, string requestId)
 		{
 			lock (locker)
 			{
@@ -45,7 +45,7 @@ namespace Xamarin.Forms.Platform.Skia
 			lock(locker)
 			{
 				if (downloadTask?.IsCompleted ?? true)
-					downloadTask = _runDownloader();
+					downloadTask =  Task.Run(_runDownloader);
 				return downloadTask;
 			}
 		}
@@ -101,7 +101,7 @@ namespace Xamarin.Forms.Platform.Skia
 				{
 					bitmaps.Remove(url);
 					var task = tasks[url];
-					task.TrySetCanceled();
+					task.TrySetResult(false);
 					tasks.Remove(url);
 					urlQueue.Remove(url);
 					urlRequests.Remove(url);
