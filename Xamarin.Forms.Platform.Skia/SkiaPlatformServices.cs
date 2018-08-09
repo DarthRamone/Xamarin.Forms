@@ -16,7 +16,7 @@ namespace Xamarin.Forms.Platform.Skia
 	{
 		public bool IsInvokeRequired => false;
 
-		public string RuntimePlatform => "Previewer";
+		public string RuntimePlatform => "Android";
 
 		public void BeginInvokeOnMainThread(Action action)
 		{
