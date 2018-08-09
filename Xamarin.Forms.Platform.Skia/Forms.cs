@@ -9,8 +9,15 @@ namespace Xamarin.Forms.Platform.Skia
 	{
 		public static IPlatform Platform = new Platform();
 
+		static string currentDrawRequest;
 		public static void Draw (Element element, Rectangle region, SKSurface surface, Action redraw)
 		{
+			if (!string.IsNullOrWhiteSpace(currentDrawRequest))
+			{
+				ImageCache.ClearCache(currentDrawRequest);
+			}
+			currentDrawRequest = Guid.NewGuid().ToString();
+
 			var canvas = surface.Canvas;
 
 			canvas.Clear(SKColors.White);
@@ -37,7 +44,7 @@ namespace Xamarin.Forms.Platform.Skia
 					drawStack.Push(child);
 				}
 
-				DrawElement(current, canvas);
+				DrawElement(current, canvas, currentDrawRequest,redraw);
 			}
 		}
 
@@ -144,6 +151,40 @@ namespace Xamarin.Forms.Platform.Skia
 			Device.Info = new SkiaDeviceInfo();
 		}
 
+		private static async void DrawImage(Image image, SKCanvas canvas, string drawRequest, Action redraw)
+		{
+			SKBitmap bitmap = null;
+			if (image.Source is UriImageSource uri)
+			{
+				var url = uri.Uri.AbsoluteUri;
+				bitmap = ImageCache.TryGetValue(url);
+				if (bitmap == null)
+				{
+					var success = await ImageCache.LoadImage(url, drawRequest);
+					if (success && drawRequest == currentDrawRequest)
+						redraw?.Invoke();
+					return;
+				}
+			}
+			if (bitmap != null)
+			{
+				var bounds = image.Bounds;
+				try
+				{
+					if ((int)bounds.Height != bitmap.Height || bitmap.Width != (int)bounds.Width)
+					{
+						var scaled = bitmap.Resize(new SKImageInfo((int)bounds.Width, (int)bounds.Height), SKBitmapResizeMethod.Box);
+						bitmap = scaled ?? bitmap;
+					}
+				}
+				catch(Exception ex)
+				{
+					Console.WriteLine(ex);
+				}
+				canvas.DrawBitmap(bitmap, bounds.ToSKRect());
+			}
+		}
+
 		private static void DrawButton(Button button, SKCanvas canvas)
 		{
 			//-----------------------------------------------------------------------------
@@ -226,7 +267,7 @@ namespace Xamarin.Forms.Platform.Skia
 			DrawVisualElement(page, canvas);
 		}
 
-		private static void DrawElement(Element element, SKCanvas canvas)
+		private static void DrawElement(Element element, SKCanvas canvas, string drawRequest, Action redraw)
 		{
 			if (element is ContentPage page)
 			{
@@ -243,6 +284,10 @@ namespace Xamarin.Forms.Platform.Skia
 			else if (element is BoxView box)
 			{
 				DrawBoxView(box, canvas);
+			}
+			else if (element is Image image)
+			{
+				DrawImage(image, canvas, drawRequest, redraw);
 			}
 		}
 

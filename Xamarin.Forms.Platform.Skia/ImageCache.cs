@@ -30,9 +30,9 @@ namespace Xamarin.Forms.Platform.Skia
 			{
 				if(!tasks.TryGetValue(url, out var task)){
 					var tcs = new TaskCompletionSource<bool>();
-					tasks[url] =  tcs;
+					task = tasks[url] =  tcs;
 					urlRequests[url] = requestId;
-					urlQueue.Enqueue(url);
+ 					urlQueue.Enqueue(url);
 					RunDownloader();
 				}
 				return task.Task;
@@ -69,7 +69,7 @@ namespace Xamarin.Forms.Platform.Skia
 				{
 					await stream.CopyToAsync(memStream);
 					memStream.Seek(0, SeekOrigin.Begin);
-					var webBitmap = SKBitmap.Decode(stream);
+					var webBitmap = SKBitmap.Decode(memStream);
 					lock (locker)
 					{
 						bitmaps[url] = webBitmap;
@@ -94,6 +94,7 @@ namespace Xamarin.Forms.Platform.Skia
 
 		public static void ClearCache(string requestId)
 		{
+			return;
 			lock (locker)
 			{
 				var urls = urlRequests.Where(x => x.Value == requestId).Select(x=> x.Key).ToList();
