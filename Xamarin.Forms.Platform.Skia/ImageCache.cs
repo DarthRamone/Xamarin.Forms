@@ -18,22 +18,42 @@ namespace Xamarin.Forms.Platform.Skia
 		static string BaseCacheDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Previewer");
 		static string CacheFolder = Path.Combine(BaseCacheDirectory, "Cache");
 		static object locker = new object();
-		static Dictionary<string, SKBitmap> bitmaps = new Dictionary<string, SKBitmap>();
 		static Dictionary<string, TaskCompletionSource<bool>> tasks = new Dictionary<string, TaskCompletionSource<bool>>();
 		static Dictionary<string, string> urlRequests = new Dictionary<string, string>();
 		static SimpleQueue<string> urlQueue = new SimpleQueue<string>();
+
+		public static (SKBitmap bitmap, int scale) FromFile(string file)
+		{
+			var root = Path.Combine(BaseCacheDirectory, Path.GetDirectoryName(file));
+			var fileName = Path.GetFileNameWithoutExtension(file);
+			var files = Directory.GetFiles(root, $"{fileName}.*");
+			var path = files.FirstOrDefault();
+			if(!string.IsNullOrWhiteSpace(path) && File.Exists(path))
+				return (SKBitmap.Decode(path), 1);
+			path = Path.Combine(root, fileName);
+
+			var p = CheckScale(root,fileName, 2);
+			if (p.success)
+				return (SKBitmap.Decode(p.file), 2);
+			p = CheckScale(root, fileName, 3);
+			if (p.success)
+				return (SKBitmap.Decode(p.file), 3);
+			return (null,0);
+		}
+
+		static (String file, bool success) CheckScale(string dir, string fileName, int scale)
+		{
+			var name = $"{fileName}@{scale}x.*";
+			var files = Directory.GetFiles(dir, name);
+			var path = files.FirstOrDefault();
+			return (path, (!string.IsNullOrWhiteSpace(path) && File.Exists(path)));
+		}
 
 		public static SKBitmap TryGetValue(string url)
 		{
 			lock (locker)
 			{
-				bitmaps.TryGetValue(url, out var bitmap);
-				if(bitmap == null)
-				{
-					bitmap = LoadFromLocalCache(url);
-					if (bitmap != null)
-						bitmaps[url] = bitmap;
-				}
+				var bitmap = LoadFromLocalCache(url);
 				return bitmap;
 			}
 		}
@@ -93,11 +113,6 @@ namespace Xamarin.Forms.Platform.Skia
 				using (var fileStream = new FileStream(cache, FileMode.Create, FileAccess.Write, FileShare.None))
 				{
 					await stream.CopyToAsync(fileStream);
-					var webBitmap = SKBitmap.Decode(cache);
-					lock (locker)
-					{
-						bitmaps[url] = webBitmap;
-					}
 					success = true;
 				};
 			}
@@ -125,7 +140,6 @@ namespace Xamarin.Forms.Platform.Skia
 				var urls = urlRequests.Where(x => x.Value == requestId).Select(x => x.Key).ToList();
 				foreach (var url in urls)
 				{
-					bitmaps.Remove(url);
 					var task = tasks[url];
 					task.TrySetResult(false);
 					tasks.Remove(url);

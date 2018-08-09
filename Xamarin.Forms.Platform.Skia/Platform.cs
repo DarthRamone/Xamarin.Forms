@@ -64,6 +64,16 @@ namespace Xamarin.Forms.Platform.Skia
 						return new SizeRequest(new Size(bitmap.Width/multiplier, bitmap.Height/multiplier));
 					}
 				}
+				if(image.Source is FileImageSource fileSource)
+				{
+					var s = ImageCache.FromFile(fileSource.File);
+					var bitmap = s.bitmap;
+					int multiplier = s.scale;
+					if (bitmap != null)
+					{
+						return new SizeRequest(new Size(bitmap.Width / multiplier, bitmap.Height / multiplier));
+					}
+				}
 				return new SizeRequest(new Size(10, 10));
 			}
 			else

@@ -176,6 +176,9 @@ namespace Xamarin.Forms.Platform.Skia
 
 					return;
 				}
+			} else if(image.Source is FileImageSource fileSource)
+			{
+				bitmap = ImageCache.FromFile(fileSource.File).bitmap;
 			}
 			if (bitmap != null)
 			{
