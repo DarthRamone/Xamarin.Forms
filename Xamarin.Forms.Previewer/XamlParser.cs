@@ -109,7 +109,7 @@ namespace  Xamarin.Forms.Previewer
                             </Image.Triggers>
                         </Image>
                         <Image VerticalOptions=""Center"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_forward%402x.png"" />
-                        <Image VerticalOptions=""Center"" Margin=""30,0,0,0"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_raw%402x.png"" />
+                        <Image VerticalOptions=""Center"" Margin=""30,0,0,0"" Source=""https://github.com/sthewissen/KickassUI.Spotify/raw/master/src/iOS/Resources/button_repeat%402x.png"" />
                     </StackLayout>
                     <StackLayout Orientation=""Horizontal"" HorizontalOptions=""Center"">
                         <StackLayout.Margin>

@@ -48,10 +48,20 @@ namespace Xamarin.Forms.Platform.Skia
 				if (image.Source is UriImageSource uri)
 				{
 					var url = uri.Uri.AbsoluteUri;
+					var localPath = uri.Uri.LocalPath;
+					int multiplier = 1;
+					if(localPath.EndsWith("@2x.png"))
+					{
+						multiplier = 2;
+					}
+					if (localPath.EndsWith("@3x.png"))
+					{
+						multiplier = 3;
+					}
 					var bitmap = ImageCache.TryGetValue(url);
 					if(bitmap != null)
 					{
-						return new SizeRequest(new Size(bitmap.Width, bitmap.Height));
+						return new SizeRequest(new Size(bitmap.Width/multiplier, bitmap.Height/multiplier));
 					}
 				}
 				return new SizeRequest(new Size(100, 100));
