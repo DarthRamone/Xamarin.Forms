@@ -49,13 +49,15 @@ namespace Xamarin.Forms.Platform.Skia
 				{
 					var url = uri.Uri.AbsoluteUri;
 					var bitmap = ImageCache.TryGetValue(url);
-					if(bitmap != null)
+					if (bitmap != null)
 					{
 						return new SizeRequest(new Size(bitmap.Width, bitmap.Height));
 					}
 				}
 				return new SizeRequest(new Size(100, 100));
 			}
+			else
+				result = new SizeRequest(new Size(100, 100));
 
 			if (result == null)
 				throw new NotImplementedException();
