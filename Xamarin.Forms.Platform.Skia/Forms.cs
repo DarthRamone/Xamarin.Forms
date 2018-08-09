@@ -164,7 +164,11 @@ namespace Xamarin.Forms.Platform.Skia
 				{
 					var success = await ImageCache.LoadImage(url, drawRequest);
 					if (success && drawRequest == currentDrawRequest)
+					{
+						image.InvalidateMeasureNonVirtual(InvalidationTrigger.Undefined);
 						redraw?.Invoke();
+					}
+
 					return;
 				}
 			}
