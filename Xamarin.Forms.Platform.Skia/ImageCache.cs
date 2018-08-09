@@ -94,7 +94,6 @@ namespace Xamarin.Forms.Platform.Skia
 
 		public static void ClearCache(string requestId)
 		{
-			return;
 			lock (locker)
 			{
 				var urls = urlRequests.Where(x => x.Value == requestId).Select(x=> x.Key).ToList();

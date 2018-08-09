@@ -10,13 +10,18 @@ namespace Xamarin.Forms.Platform.Skia
 		public static IPlatform Platform = new Platform();
 
 		static string currentDrawRequest;
+		static Element currentElement;
 		public static void Draw (Element element, Rectangle region, SKSurface surface, Action redraw)
 		{
-			if (!string.IsNullOrWhiteSpace(currentDrawRequest))
+			if (!string.IsNullOrWhiteSpace(currentDrawRequest) && currentElement != element)
 			{
 				ImageCache.ClearCache(currentDrawRequest);
 			}
-			currentDrawRequest = Guid.NewGuid().ToString();
+			if (currentElement != element)
+			{
+				currentDrawRequest = Guid.NewGuid().ToString();
+				currentElement = element;
+			}
 
 			var canvas = surface.Canvas;
 
@@ -169,18 +174,6 @@ namespace Xamarin.Forms.Platform.Skia
 			if (bitmap != null)
 			{
 				var bounds = image.Bounds;
-				try
-				{
-					if ((int)bounds.Height != bitmap.Height || bitmap.Width != (int)bounds.Width)
-					{
-						var scaled = bitmap.Resize(new SKImageInfo((int)bounds.Width, (int)bounds.Height), SKBitmapResizeMethod.Box);
-						bitmap = scaled ?? bitmap;
-					}
-				}
-				catch(Exception ex)
-				{
-					Console.WriteLine(ex);
-				}
 				canvas.DrawBitmap(bitmap, bounds.ToSKRect());
 			}
 		}
