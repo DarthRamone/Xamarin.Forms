@@ -204,10 +204,10 @@ namespace Xamarin.Forms.Platform.Skia
 			var result = new SKPath();
 			result.MoveTo(b.Left + topLeft, b.Top);
 			result.LineTo(b.Right - topRight, b.Top);
-			result.ArcTo(b.Right - topRight, b.Top, b.Right, b.Top + topRight, topRight);
-			result.ArcTo(b.Right, b.Bottom - bottomRight, b.Right - bottomRight, b.Bottom, bottomRight);
-			result.ArcTo(b.Left + bottomLeft, b.Bottom, b.Left, b.Bottom - bottomLeft, bottomLeft);
-			result.ArcTo(b.Left, b.Top + topLeft, b.Left + topLeft, b.Top, topLeft);
+			result.ArcTo(b.Right, b.Top, b.Right, b.Top + topRight, topRight);
+			result.ArcTo(b.Right, b.Bottom, b.Right - bottomRight, b.Bottom, bottomRight);
+			result.ArcTo(b.Left, b.Bottom, b.Left, b.Bottom - bottomLeft, bottomLeft);
+			result.ArcTo(b.Left, b.Top, b.Left + topLeft, b.Top, topLeft);
 
 			return result;
 		}
@@ -216,7 +216,9 @@ namespace Xamarin.Forms.Platform.Skia
 		{
 			var corner = box.CornerRadius;
 			var paint = new SKPaint();
-			paint.Color = box.Color.ToSKColor(Color.Transparent);
+			paint.IsAntialias = true;
+			var color = box.Color.IsDefault ? box.BackgroundColor : box.Color;
+			paint.Color = color.ToSKColor(Color.Transparent);
 
 			canvas.DrawPath(RoundedRect(box.Bounds, box.CornerRadius), paint);
 		}
